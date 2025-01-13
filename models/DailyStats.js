@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config();
+
+const nutrientsSchema = new mongoose.Schema({
+  calories: {type: Number, required: true},
+  proteins: {type: Number, required: true},
+  fats: {type: Number, required: true},
+  carbs: {type: Number, required: true},
+});
 
 const dailyStatsSchema = new mongoose.Schema(
   {
@@ -13,23 +18,21 @@ const dailyStatsSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    calories: {
-      goal: Number,
-      consumed: Number,
+    goals: {
+      total: nutrientsSchema,
+      mealSplits: {
+        breakfast: nutrientsSchema, // 25%
+        lunch: nutrientsSchema, // 35%
+        dinner: nutrientsSchema, // 30%
+        snack: nutrientsSchema, // 10%
+      },
     },
-    nutrients: {
-      proteins: {
-        goal: Number,
-        consumed: Number,
-      },
-      fats: {
-        goal: Number,
-        consumed: Number,
-      },
-      carbs: {
-        goal: Number,
-        consumed: Number,
-      },
+    consumed: {
+      total: nutrientsSchema,
+      breakfast: nutrientsSchema,
+      lunch: nutrientsSchema,
+      dinner: nutrientsSchema,
+      snack: nutrientsSchema,
     },
   },
   {
@@ -37,7 +40,7 @@ const dailyStatsSchema = new mongoose.Schema(
   }
 );
 
-// Unique index yaratish (bir foydalanuvchi uchun bir kunda bitta record)
+// Unique index (bir foydalanuvchi uchun bir kunda bitta record)
 dailyStatsSchema.index({userId: 1, date: 1}, {unique: true});
 
 export default mongoose.model("DailyStats", dailyStatsSchema);

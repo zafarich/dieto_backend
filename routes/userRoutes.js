@@ -5,7 +5,7 @@ import {
   updatePremiumStatus,
   calculateDailyGoals,
 } from "../controllers/userController.js";
-import {auth} from "../middleware/auth.js";
+import {auth} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

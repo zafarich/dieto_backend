@@ -43,10 +43,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    dailyCalories: Number,
-    dailyProteins: Number,
-    dailyFats: Number,
-    dailyCarbs: Number,
     aiRecommendation: String,
     userStatus: {
       type: String,
