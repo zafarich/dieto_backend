@@ -1,11 +1,12 @@
 import User from "../models/User.js";
+import {updateDailyGoals} from "./dailyStatsController.js";
 import {calculateDailyNutrients} from "../services/aiService.js";
 
 // Foydalanuvchini yaratish yoki mavjud bo'lsa yangilash
-export const createOrUpdateUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
+    const {telegramId} = req.headers["telegram-user-id"];
     const {
-      telegramId,
       name,
       gender,
       birthDate,
@@ -16,9 +17,16 @@ export const createOrUpdateUser = async (req, res) => {
       phone,
     } = req.body;
 
+    // Sanani ISO formatga o'tkazish
+    const [day, month, year] = birthDate.split(".");
+    const formattedBirthDate = new Date(
+      year,
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+
     // Majburiy maydonlarni tekshirish
     const requiredFields = [
-      "telegramId",
       "name",
       "gender",
       "birthDate",
@@ -49,7 +57,7 @@ export const createOrUpdateUser = async (req, res) => {
         {
           name,
           gender,
-          birthDate,
+          birthDate: formattedBirthDate,
           weight,
           height,
           activityLevel,
@@ -65,7 +73,7 @@ export const createOrUpdateUser = async (req, res) => {
         telegramId,
         name,
         gender,
-        birthDate,
+        birthDate: formattedBirthDate,
         weight,
         height,
         activityLevel,
@@ -74,6 +82,12 @@ export const createOrUpdateUser = async (req, res) => {
         phone,
       });
     }
+
+    // Kunlik me'yorlarni yangilash
+    await updateDailyGoals(user._id, {
+      ...user.toObject(),
+      forceUpdate: true,
+    });
 
     res.status(200).json({
       success: true,
@@ -86,11 +100,42 @@ export const createOrUpdateUser = async (req, res) => {
     });
   }
 };
+export const updateUserField = async (req, res) => {
+  const {telegramId} = req.headers["telegram-user-id"];
+  const body = req.body;
+  const user = await User.findOneAndUpdate(
+    {telegramId},
+    {$set: body},
+    {new: true}
+  );
 
+  const fields_for_calculation = [
+    "gender",
+    "weight",
+    "height",
+    "birthDate",
+    "goalWeight",
+    "activityLevel",
+  ];
+
+  if (fields_for_calculation.includes(Object.keys(body)[0])) {
+    await updateDailyGoals(user._id, {
+      ...user.toObject(),
+      forceUpdate: true,
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+};
 // Foydalanuvchi ma'lumotlarini olish
 export const getUser = async (req, res) => {
   try {
-    const user = await User.findOne({telegramId: req.params.telegramId});
+    const user = await User.findOne({
+      telegramId: req.headers["telegram-user-id"],
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -132,42 +177,6 @@ export const updatePremiumStatus = async (req, res) => {
     res.status(200).json({
       success: true,
       data: user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// Kunlik me'yorlarni hisoblash
-export const calculateDailyGoals = async (req, res) => {
-  try {
-    const {telegramId} = req.params;
-    const user = await User.findOne({telegramId});
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Foydalanuvchi topilmadi",
-      });
-    }
-
-    const dailyGoals = await calculateDailyNutrients(user);
-
-    // Foydalanuvchi ma'lumotlarini yangilash
-    user.dailyCalories = dailyGoals.dailyCalories;
-    user.dailyProteins = dailyGoals.dailyProteins;
-    user.dailyFats = dailyGoals.dailyFats;
-    user.dailyCarbs = dailyGoals.dailyCarbs;
-    // user.aiRecommendation = dailyGoals.recommendation;
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      data: dailyGoals,
     });
   } catch (error) {
     res.status(400).json({

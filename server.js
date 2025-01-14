@@ -3,6 +3,8 @@ import cors from "cors";
 import config from "./config/config.js";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
+import dailyStatsRoutes from "./routes/dailyStatsRoutes.js";
+import {startDailyStatsScheduler} from "./services/schedulerService.js";
 
 const app = express();
 
@@ -14,8 +16,12 @@ app.use(express.urlencoded({extended: true}));
 // Database ulanish
 connectDB();
 
+// Schedulerni ishga tushirish
+startDailyStatsScheduler();
+
 // Routes
 app.use("/api", userRoutes);
+app.use("/api/daily-stats", dailyStatsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,20 +1,20 @@
 import express from "express";
 import {
-  createOrUpdateUser,
+  createUser,
   getUser,
+  updateUserField,
   updatePremiumStatus,
-  calculateDailyGoals,
 } from "../controllers/userController.js";
 import {auth} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Public route - foydalanuvchi yaratish/yangilash
-router.post("/users", createOrUpdateUser);
+// router.post("/users", createUser);
 
 // Protected routes - auth middleware orqali himoyalangan
-router.get("/users/:telegramId", auth, getUser);
-router.patch("/users/:telegramId/premium", auth, updatePremiumStatus);
-router.post("/users/:telegramId/calculate-goals", auth, calculateDailyGoals);
-
+router.get("/users/create", auth, createUser);
+router.patch("/users/premium", auth, updatePremiumStatus);
+router.put("/users/update", auth, updateUserField);
+router.get("/user/me", auth, getUser);
 export default router;
