@@ -28,12 +28,11 @@ export const calculateDailyNutrients = (userData) => {
 
     // 3. TEE (Total Energy Expenditure) ni hisoblash
     const tee = bmr * activityFactors[userData.activityLevel];
-
     // 4. Maqsadga qarab kaloriyani sozlash
     const weightDiff = userData.goalWeight - userData.weight;
-    const calorieAdjustment = (weightDiff / 0.5) * 500;
+    const calorieAdjustment = (weightDiff / 0.5) * 800;
     let dailyCalories = Math.round(
-      tee + Math.max(-500, Math.min(500, calorieAdjustment))
+      tee + Math.max(-800, Math.min(800, calorieAdjustment))
     );
 
     // 5. Makronutrientlarni maqsadga qarab hisoblash

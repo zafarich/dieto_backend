@@ -5,31 +5,38 @@ export const calculateMealSplits = async (user) => {
     // AI xizmatidan kunlik me'yorlarni olish
     const dailyNorms = await calculateDailyNutrients(user);
 
+    const for_lose_weight = user.goalWeight < user.weight;
+
+    const percent_breakfast = for_lose_weight ? 0.2 : 0.25;
+    const percent_lunch = for_lose_weight ? 0.45 : 0.35;
+    const percent_dinner = for_lose_weight ? 0.2 : 0.25;
+    const percent_snack = 0.15;
+
     // Ovqatlanish vaqtlarini taqsimlash
     const mealSplits = {
       breakfast: {
-        calories: Math.round(dailyNorms.dailyCalories * 0.3), // 30%
-        proteins: Math.round(dailyNorms.dailyProteins * 0.3),
-        fats: Math.round(dailyNorms.dailyFats * 0.3),
-        carbs: Math.round(dailyNorms.dailyCarbs * 0.3),
+        calories: Math.round(dailyNorms.dailyCalories * percent_breakfast), // 30%
+        proteins: Math.round(dailyNorms.dailyProteins * percent_breakfast),
+        fats: Math.round(dailyNorms.dailyFats * percent_breakfast),
+        carbs: Math.round(dailyNorms.dailyCarbs * percent_breakfast),
       },
       lunch: {
-        calories: Math.round(dailyNorms.dailyCalories * 0.35), // 35%
-        proteins: Math.round(dailyNorms.dailyProteins * 0.35),
-        fats: Math.round(dailyNorms.dailyFats * 0.35),
-        carbs: Math.round(dailyNorms.dailyCarbs * 0.35),
+        calories: Math.round(dailyNorms.dailyCalories * percent_lunch), // 35%
+        proteins: Math.round(dailyNorms.dailyProteins * percent_lunch),
+        fats: Math.round(dailyNorms.dailyFats * percent_lunch),
+        carbs: Math.round(dailyNorms.dailyCarbs * percent_lunch),
       },
       dinner: {
-        calories: Math.round(dailyNorms.dailyCalories * 0.25), // 25%
-        proteins: Math.round(dailyNorms.dailyProteins * 0.25),
-        fats: Math.round(dailyNorms.dailyFats * 0.25),
-        carbs: Math.round(dailyNorms.dailyCarbs * 0.25),
+        calories: Math.round(dailyNorms.dailyCalories * percent_dinner), // 25%
+        proteins: Math.round(dailyNorms.dailyProteins * percent_dinner),
+        fats: Math.round(dailyNorms.dailyFats * percent_dinner),
+        carbs: Math.round(dailyNorms.dailyCarbs * percent_dinner),
       },
       snacks: {
-        calories: Math.round(dailyNorms.dailyCalories * 0.1), // 10%
-        proteins: Math.round(dailyNorms.dailyProteins * 0.1),
-        fats: Math.round(dailyNorms.dailyFats * 0.1),
-        carbs: Math.round(dailyNorms.dailyCarbs * 0.1),
+        calories: Math.round(dailyNorms.dailyCalories * percent_snack), // 10%
+        proteins: Math.round(dailyNorms.dailyProteins * percent_snack),
+        fats: Math.round(dailyNorms.dailyFats * percent_snack),
+        carbs: Math.round(dailyNorms.dailyCarbs * percent_snack),
       },
     };
 

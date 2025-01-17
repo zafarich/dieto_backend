@@ -16,18 +16,16 @@ const mealSchema = new mongoose.Schema(
       enum: ["breakfast", "lunch", "dinner", "snack"],
       required: true,
     },
-    name: {
-      type: String,
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
       required: true,
     },
     weight: {
       type: Number,
       required: true,
     },
-    calories: Number,
-    proteins: Number,
-    fats: Number,
-    carbs: Number,
+    // Qo'shimcha: Mahsulotning o'zgarishiga mos ravishda ovqatning kaloriyalari va boshqa o'lchovlarini yangilash
   },
   {
     timestamps: true,

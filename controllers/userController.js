@@ -101,7 +101,7 @@ export const createUser = async (req, res) => {
   }
 };
 export const updateUserField = async (req, res) => {
-  const {telegramId} = req.headers["telegram-user-id"];
+  const telegramId = req.headers["telegram-user-id"];
   const body = req.body;
   const user = await User.findOneAndUpdate(
     {telegramId},
@@ -118,7 +118,11 @@ export const updateUserField = async (req, res) => {
     "activityLevel",
   ];
 
-  if (fields_for_calculation.includes(Object.keys(body)[0])) {
+  const checkFields = Object.keys(body).some((key) =>
+    fields_for_calculation.includes(key)
+  );
+
+  if (checkFields) {
     await updateDailyGoals(user._id, {
       ...user.toObject(),
       forceUpdate: true,

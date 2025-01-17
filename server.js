@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import dailyStatsRoutes from "./routes/dailyStatsRoutes.js";
 import {startDailyStatsScheduler} from "./services/schedulerService.js";
+import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
 
@@ -22,7 +23,7 @@ startDailyStatsScheduler();
 // Routes
 app.use("/api", userRoutes);
 app.use("/api/daily-stats", dailyStatsRoutes);
-
+app.use("/api/products", productRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

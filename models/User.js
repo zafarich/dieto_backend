@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
     premiumExpiresAt: Date,
     language: {
       type: String,
-      enum: ["uz", "ru", "en"],
+      enum: ["uz", "ru"],
       default: "uz",
     },
   },
