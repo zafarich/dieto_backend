@@ -13,16 +13,22 @@ const productSchema = new mongoose.Schema(
     name: {
       type: localizedStringSchema,
       required: true,
-      unique: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    isPublic: {
+      type: Boolean,
+      default: false, // admin tomonidan qo'shilgan mahsulotlar uchun true
     },
     measureType: {
       type: String,
       enum: ["count", "gram", "ml"],
-      required: true,
     },
     description: {
       type: localizedStringSchema,
-      required: true,
     },
     calories: {
       type: Number,
@@ -46,7 +52,11 @@ const productSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      required: true,
+      default: "", // Bo'sh string agar rasm bo'lmasa
+    },
+    aiGenerated: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -54,7 +64,13 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Unique index (mahsulot nomi bir xil bo'lmasligi uchun)
-productSchema.index({"name.uz": 1, "name.ru": 1}, {unique: true});
+// Unique index (faqat public mahsulotlar uchun)
+productSchema.index(
+  {"name.uz": 1, "name.ru": 1, isPublic: 1},
+  {
+    unique: true,
+    partialFilterExpression: {isPublic: true},
+  }
+);
 
 export default mongoose.model("Product", productSchema);

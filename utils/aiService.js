@@ -10,10 +10,9 @@ const SYSTEM_PROMPT = `You are an expert in analyzing various food products, inc
 1. The calorie and fat content should conform to standard nutritional guidelines. For Uzbek dishes, assume they are higher in fat compared to other products and beverages.
 2. All numerical values must be integers.
 3. Weight and calories must be greater than 0.
-4. measureType should be one of 'count', 'gram', or 'ml'.
-5. The list of ingredients must not be empty.
-6. For any product or beverage, determine their calorie content.
-7. When user provides additional notes about ingredients, you must:
+4. The list of ingredients must not be empty.
+5. For any product or beverage, determine their calorie content.
+6. When user provides additional notes about ingredients, you must:
    - Update the specified ingredient's details
    - Recalculate total weight as sum of all ingredients
    - Recalculate total calories based on updated ingredients
@@ -29,7 +28,6 @@ const JSON_TEMPLATE = `{
   "proteins": x, // Oqsillar (gramm)
   "fats": x, // Yog'lar (gramm)
   "carbs": x, // Uglevodlar (gramm)
-  "measureType": "gram", // 'count', 'gram', 'ml'
   "ingredients": [
     {
       "name": "Ingredient nomi",

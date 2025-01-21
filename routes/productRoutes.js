@@ -5,11 +5,29 @@ import {
   confirmProduct,
   retryAnalysis,
   getUserProducts,
+  createManualProduct,
+  getFavoriteProducts,
+  getConsumedProducts,
 } from "../controllers/productController.js";
 import multer from "multer";
+import path from "path";
+import {fileURLToPath} from "url";
 
-// Rasm yuklash uchun multer sozlamalari
-const storage = multer.memoryStorage();
+// __dirname ni olish uchun
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Rasm saqlash uchun multer sozlamalari
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/uploads/products")); // backend/public/uploads/products papkasi
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, "product-" + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
 const upload = multer({
   storage,
   limits: {fileSize: 5 * 1024 * 1024},
@@ -38,7 +56,12 @@ router.post("/retry", auth, retryAnalysis);
 // Tasdiqlangan mahsulotni qo'shish
 router.post("/confirm", auth, confirmProduct);
 
+// Qo'lda mahsulot qo'shish
+router.post("/manual", auth, createManualProduct);
+
 // Foydalanuvchi mahsulotlarini olish
 router.get("/products", auth, getUserProducts);
+router.get("/favorites", auth, getFavoriteProducts);
+router.get("/consumed", auth, getConsumedProducts);
 
 export default router;

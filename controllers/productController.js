@@ -6,6 +6,7 @@ import {
   processImageWithOpenAI,
   processNameWithOpenAI,
 } from "../utils/aiService.js";
+import UserFavoriteProducts from "../models/UserFavoriteProducts.js";
 
 // Global o'zgaruvchi yaratamiz
 const tempProducts = new Map();
@@ -27,7 +28,19 @@ export const uploadProduct = async (req, res) => {
     const notes = userNote ? [userNote] : [];
 
     if (image) {
-      aiResponse = await processImageWithOpenAI(image.buffer, notes);
+      // Rasm fayl yo'li
+      const imageUrl = `/public/uploads/products/${image.filename}`;
+
+      console.log(image);
+
+      aiResponse = await processImageWithOpenAI(image.path, notes);
+
+      tempProducts.set(telegramId, {
+        aiResponse,
+        originalImage: imageUrl,
+        originalName: name || null,
+        userNotes: [...existingNotes, ...notes],
+      });
     } else if (name) {
       aiResponse = await processNameWithOpenAI(name, userLanguage, notes);
     } else {
@@ -39,7 +52,10 @@ export const uploadProduct = async (req, res) => {
 
     // Vaqtinchalik ma'lumotlarni Map-da saqlash
     const existingProduct = tempProducts.get(telegramId);
-    const existingNotes = existingProduct ? existingProduct.userNotes : [];
+    const existingNotes =
+      existingProduct && existingProduct?.userNotes
+        ? existingProduct?.userNotes
+        : [];
 
     tempProducts.set(telegramId, {
       aiResponse,
@@ -80,8 +96,11 @@ export const retryAnalysis = async (req, res) => {
       });
     }
 
-    const allNotes = [...(tempProduct.userNotes || []), newNote];
+    console.log(tempProduct);
+    console.log(newNote);
 
+    const allNotes = [...(tempProduct?.userNotes || []), newNote];
+    console.log(allNotes);
     let aiResponse;
     if (tempProduct.originalImage) {
       aiResponse = await processImageWithOpenAI(
@@ -144,7 +163,6 @@ export const confirmProduct = async (req, res) => {
         uz: aiResponse.nameUz,
         ru: aiResponse.nameRu,
       },
-      measureType: aiResponse.measureType,
       description: {
         uz: aiResponse.descriptionUz || "",
         ru: aiResponse.descriptionRu || "",
@@ -154,7 +172,10 @@ export const confirmProduct = async (req, res) => {
       fats: aiResponse.fats,
       carbs: aiResponse.carbs,
       weight: aiResponse.weight,
-      imageUrl: tempProduct.originalImage ? "path/to/saved/image" : "",
+      imageUrl: tempProduct.originalImage || "", // Saqlangan rasm yo'li
+      createdBy: user._id,
+      isPublic: false,
+      aiGenerated: true,
     });
 
     await newProduct.save();
@@ -173,6 +194,9 @@ export const confirmProduct = async (req, res) => {
 
       // DailyStats ni yangilash
       await updateDailyStats(user._id, meal, aiResponse);
+
+      // Favorite mahsulotlarga qo'shish
+      await updateFavoriteProducts(user._id, newProduct._id);
     }
 
     // Muvaffaqiyatli saqlangandan so'ng vaqtinchalik ma'lumotlarni o'chirish
@@ -259,6 +283,171 @@ export const getUserProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Mahsulotlarni olishda xatolik:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * Qo'lda mahsulot qo'shish
+ */
+export const createManualProduct = async (req, res) => {
+  try {
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+    const {
+      nameUz,
+      nameRu,
+      weight,
+      measureType,
+      calories,
+      proteins,
+      fats,
+      carbs,
+      mealType,
+      consumptionDate,
+    } = req.body;
+
+    const image = req.file;
+    const imageUrl = image ? `/public/uploads/products/${image.filename}` : "";
+
+    // Yangi mahsulot yaratish
+    const newProduct = new Product({
+      name: {
+        uz: nameUz,
+        ru: nameRu || nameUz,
+      },
+      createdBy: user._id,
+      isPublic: false,
+      measureType,
+      calories,
+      proteins,
+      fats,
+      carbs,
+      weight,
+      aiGenerated: false,
+      imageUrl: imageUrl,
+    });
+
+    await newProduct.save();
+
+    // Agar ovqat turi va sana ko'rsatilgan bo'lsa, Meal yaratish
+    if (mealType && consumptionDate) {
+      const meal = new Meal({
+        userId: user._id,
+        date: new Date(consumptionDate),
+        type: mealType,
+        productId: newProduct._id,
+        weight: weight,
+      });
+
+      await meal.save();
+
+      // DailyStats ni yangilash
+      await updateDailyStats(user._id, meal, newProduct);
+
+      // Favorite mahsulotlarga qo'shish
+      await updateFavoriteProducts(user._id, newProduct._id);
+    }
+
+    res.status(201).json({
+      success: true,
+      data: {
+        product: newProduct,
+        meal: meal || null,
+      },
+    });
+  } catch (error) {
+    console.error("Mahsulot qo'shishda xatolik:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * Favorite mahsulotlarni yangilash
+ */
+async function updateFavoriteProducts(userId, productId) {
+  try {
+    const favorite = await UserFavoriteProducts.findOne({userId, productId});
+
+    if (favorite) {
+      favorite.usageCount += 1;
+      favorite.lastUsed = new Date();
+      await favorite.save();
+    } else {
+      await UserFavoriteProducts.create({
+        userId,
+        productId,
+        usageCount: 1,
+        lastUsed: new Date(),
+      });
+    }
+  } catch (error) {
+    console.error("Favorite mahsulotlarni yangilashda xatolik:", error);
+  }
+}
+
+/**
+ * Favorite mahsulotlarni olish
+ */
+export const getFavoriteProducts = async (req, res) => {
+  try {
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+
+    const favorites = await UserFavoriteProducts.find({userId: user._id})
+      .sort({usageCount: -1, lastUsed: -1})
+      .limit(10)
+      .populate("productId");
+
+    res.status(200).json({
+      success: true,
+      data: favorites,
+    });
+  } catch (error) {
+    console.error("Favorite mahsulotlarni olishda xatolik:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * Iste'mol qilingan mahsulotlarni olish
+ */
+export const getConsumedProducts = async (req, res) => {
+  try {
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+    const {date, type, limit = 20} = req.query;
+
+    const query = {userId: user._id};
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      query.date = {$gte: startDate, $lte: endDate};
+    }
+    if (type) query.type = type;
+
+    const meals = await Meal.find(query)
+      .populate("productId")
+      .sort({date: -1})
+      .limit(Number(limit));
+
+    res.status(200).json({
+      success: true,
+      data: meals,
+    });
+  } catch (error) {
+    console.error("Iste'mol qilingan mahsulotlarni olishda xatolik:", error);
     res.status(500).json({
       success: false,
       message: error.message,
