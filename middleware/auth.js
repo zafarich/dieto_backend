@@ -23,8 +23,6 @@ export const auth = async (req, res, next) => {
       });
     }
 
-    // Foydalanuvchi ma'lumotlarini request'ga qo'shish
-    req.user = user;
     next();
   } catch (error) {
     res.status(401).json({
@@ -37,7 +35,8 @@ export const auth = async (req, res, next) => {
 // Premium foydalanuvchilar uchun middleware
 export const premiumAuth = async (req, res, next) => {
   try {
-    const user = req.user;
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
 
     if (user.userStatus !== "premium") {
       return res.status(403).json({

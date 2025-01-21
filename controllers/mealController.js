@@ -6,7 +6,10 @@ import User from "../models/User.js";
 export const addMeal = async (req, res) => {
   try {
     const {type, name, weight, calories, proteins, fats, carbs} = req.body;
-    const userId = req.user._id;
+
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+    const userId = user._id;
     const date = new Date();
     date.setHours(0, 0, 0, 0);
 

@@ -3,10 +3,21 @@ import config from "./config.js";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(config.mongoUri);
-    console.log(`MongoDB ulanish muvaffaqiyatli: ${conn.connection.host}`);
+    console.log("MongoDB ulanish boshlandi...");
+
+    const conn = await mongoose.connect(config.mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      family: 4,
+    });
+
+    console.log("MongoDB ga muvaffaqiyatli ulandi");
   } catch (error) {
-    console.error(`Xatolik: ${error.message}`);
+    console.error("MongoDB ulanish xatosi:", {
+      message: error.message,
+      code: error.code,
+      details: error,
+    });
     process.exit(1);
   }
 };

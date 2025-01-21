@@ -7,6 +7,9 @@ import {
   processNameWithOpenAI,
 } from "../utils/aiService.js";
 
+// Global o'zgaruvchi yaratamiz
+const tempProducts = new Map();
+
 /**
  * Mahsulotni yuklash (rasm yoki nom orqali)
  */
@@ -14,14 +17,14 @@ export const uploadProduct = async (req, res) => {
   try {
     const telegramId = req.headers["telegram-user-id"];
     const user = await User.findOne({telegramId});
-    const {name, userNotes} = req.body;
+    const {name, userNote} = req.body;
     const image = req.file;
 
     // Foydalanuvchi tilini olish
     const userLanguage = user.language || "uz";
 
     let aiResponse;
-    const notes = userNotes ? JSON.parse(userNotes) : [];
+    const notes = userNote ? [userNote] : [];
 
     if (image) {
       aiResponse = await processImageWithOpenAI(image.buffer, notes);
@@ -34,17 +37,16 @@ export const uploadProduct = async (req, res) => {
       });
     }
 
-    // Vaqtinchalik ma'lumotlarni res.locals da saqlash
-    if (!req.session) {
-      req.session = {};
-    }
+    // Vaqtinchalik ma'lumotlarni Map-da saqlash
+    const existingProduct = tempProducts.get(telegramId);
+    const existingNotes = existingProduct ? existingProduct.userNotes : [];
 
-    req.session.tempProduct = {
+    tempProducts.set(telegramId, {
       aiResponse,
       originalImage: image ? image.buffer : null,
       originalName: name || null,
-      userNotes: notes,
-    };
+      userNotes: [...existingNotes, ...notes],
+    });
 
     res.status(200).json({
       success: true,
@@ -66,8 +68,10 @@ export const retryAnalysis = async (req, res) => {
   try {
     const telegramId = req.headers["telegram-user-id"];
     const user = await User.findOne({telegramId});
-    const {newNotes} = req.body;
-    const tempProduct = req.session.tempProduct;
+    const {newNote} = req.body;
+
+    // Map-dan ma'lumotlarni olish
+    const tempProduct = tempProducts.get(telegramId);
 
     if (!tempProduct) {
       return res.status(400).json({
@@ -76,28 +80,29 @@ export const retryAnalysis = async (req, res) => {
       });
     }
 
-    const allNotes = [...(tempProduct.userNotes || []), ...newNotes];
+    const allNotes = [...(tempProduct.userNotes || []), newNote];
 
     let aiResponse;
     if (tempProduct.originalImage) {
       aiResponse = await processImageWithOpenAI(
         tempProduct.originalImage,
-        allNotes,
+        [newNote],
         tempProduct.aiResponse
       );
     } else {
       aiResponse = await processNameWithOpenAI(
         tempProduct.originalName,
         user.language,
-        allNotes
+        [newNote]
       );
     }
 
-    req.session.tempProduct = {
+    // Yangilangan ma'lumotlarni Map-da saqlash
+    tempProducts.set(telegramId, {
       ...tempProduct,
       aiResponse,
       userNotes: allNotes,
-    };
+    });
 
     res.status(200).json({
       success: true,
@@ -120,7 +125,9 @@ export const confirmProduct = async (req, res) => {
     const telegramId = req.headers["telegram-user-id"];
     const user = await User.findOne({telegramId});
     const {mealType, consumptionDate} = req.body;
-    const tempProduct = req.session.tempProduct;
+
+    // Map-dan ma'lumotlarni olish
+    const tempProduct = tempProducts.get(telegramId);
 
     if (!tempProduct || !tempProduct.aiResponse) {
       return res.status(400).json({
@@ -168,7 +175,8 @@ export const confirmProduct = async (req, res) => {
       await updateDailyStats(user._id, meal, aiResponse);
     }
 
-    delete req.session.tempProduct;
+    // Muvaffaqiyatli saqlangandan so'ng vaqtinchalik ma'lumotlarni o'chirish
+    tempProducts.delete(telegramId);
 
     res.status(201).json({
       success: true,
@@ -234,7 +242,9 @@ async function updateDailyStats(userId, meal, productData) {
  */
 export const getUserProducts = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+    const userId = user._id;
     const {date, type} = req.query;
 
     const query = {userId};

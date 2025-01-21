@@ -5,7 +5,7 @@ import {calculateDailyNutrients} from "../services/aiService.js";
 // Foydalanuvchini yaratish yoki mavjud bo'lsa yangilash
 export const createUser = async (req, res) => {
   try {
-    const {telegramId} = req.headers["telegram-user-id"];
+    const telegramId = req.headers["telegram-user-id"];
     const {
       name,
       gender,
@@ -70,8 +70,8 @@ export const createUser = async (req, res) => {
     } else {
       // Yangi foydalanuvchi yaratish
       user = await User.create({
-        telegramId,
         name,
+        telegramId,
         gender,
         birthDate: formattedBirthDate,
         weight,

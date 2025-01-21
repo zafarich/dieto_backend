@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import config from "./config/config.js";
 import connectDB from "./config/db.js";
@@ -8,6 +9,19 @@ import {startDailyStatsScheduler} from "./services/schedulerService.js";
 import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
+
+// Session middleware-ni qo'shamiz
+app.use(
+  session({
+    secret: "zafar0000A123qwe!@#", // Muhim: Bu yerga xavfsiz kalit yozing
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // HTTPS uchun
+      maxAge: 60 * 60 * 1000, // 1 soat
+    },
+  })
+);
 
 // Middleware
 app.use(cors());

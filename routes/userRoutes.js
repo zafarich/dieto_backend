@@ -13,7 +13,7 @@ const router = express.Router();
 // router.post("/users", createUser);
 
 // Protected routes - auth middleware orqali himoyalangan
-router.get("/users/create", auth, createUser);
+router.post("/users/create", auth, createUser);
 router.patch("/users/premium", auth, updatePremiumStatus);
 router.put("/users/update", auth, updateUserField);
 router.get("/user/me", auth, getUser);

@@ -1,4 +1,5 @@
 import DailyStats from "../models/DailyStats.js";
+import User from "../models/User.js";
 import {calculateMealSplits} from "../utils/nutritionCalculator.js";
 
 // Kunlik me'yorlarni yangilash
@@ -75,7 +76,10 @@ export const updateDailyGoals = async (userId, userData) => {
 
 export const getDailyStats = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
+
+    const userId = user._id;
     const dateStr = req.params.date; // "YYYY-MM-DD" formatida
 
     // Sanani UTC 00:00 ga o'rnatish

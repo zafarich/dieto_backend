@@ -12,17 +12,6 @@ export const auth = async (req, res, next) => {
       });
     }
 
-    // Foydalanuvchini bazadan tekshirish
-    const user = await User.findOne({telegramId});
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Foydalanuvchi topilmadi",
-      });
-    }
-
-    // Foydalanuvchi ma'lumotlarini request'ga qo'shish
-    req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({
@@ -35,7 +24,8 @@ export const auth = async (req, res, next) => {
 // Premium foydalanuvchilar uchun middleware
 export const premiumAuth = async (req, res, next) => {
   try {
-    const user = req.user;
+    const telegramId = req.headers["telegram-user-id"];
+    const user = await User.findOne({telegramId});
 
     if (user.userStatus !== "premium") {
       return res.status(403).json({

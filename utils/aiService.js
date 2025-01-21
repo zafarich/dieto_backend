@@ -6,12 +6,19 @@ const openai = new OpenAI({
 });
 
 // Umumiy sistema prompti
-const SYSTEM_PROMPT = `Siz o'zbek taomlarini tahlil qiladigan ekspertsiz. Quyidagi talablarga rioya qiling:
-1. Kaloriya va yog' miqdori o'zbek oshxonasi standartlariga mos bo'lishi kerak
-2. Barcha raqamli qiymatlar butun son bo'lishi kerak
-3. Og'irlik va kaloriya 0 dan katta bo'lishi shart
-4. measureType faqat 'count', 'gram' yoki 'ml' qiymatlaridan biri bo'lishi kerak
-5. Ingredientlar ro'yxati bo'sh bo'lmasligi kerak`;
+const SYSTEM_PROMPT = `You are an expert in analyzing various food products, including Uzbek dishes. Please adhere to the following requirements:
+1. The calorie and fat content should conform to standard nutritional guidelines. For Uzbek dishes, assume they are higher in fat compared to other products and beverages.
+2. All numerical values must be integers.
+3. Weight and calories must be greater than 0.
+4. measureType should be one of 'count', 'gram', or 'ml'.
+5. The list of ingredients must not be empty.
+6. For any product or beverage, determine their calorie content.
+7. When user provides additional notes about ingredients, you must:
+   - Update the specified ingredient's details
+   - Recalculate total weight as sum of all ingredients
+   - Recalculate total calories based on updated ingredients
+   - Adjust proteins, fats, and carbs proportionally based on ingredient changes
+   - Ensure all calculations maintain nutritional balance`;
 
 // JSON strukturasi uchun shablon
 const JSON_TEMPLATE = `{
