@@ -1,3 +1,4 @@
+import config from "../config/config.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 import DailyStats from "../models/DailyStats.js";
@@ -33,7 +34,10 @@ export const uploadProduct = async (req, res) => {
 
       console.log(image);
 
-      aiResponse = await processImageWithOpenAI(image.path, notes);
+      aiResponse = await processImageWithOpenAI(
+        config.siteUrl + imageUrl,
+        notes
+      );
 
       tempProducts.set(telegramId, {
         aiResponse,
