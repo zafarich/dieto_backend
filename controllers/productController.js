@@ -23,7 +23,6 @@ export const uploadProduct = async (req, res) => {
     const image = req.file;
 
     // Foydalanuvchi tilini olish
-    const userLanguage = user.language || "uz";
 
     let aiResponse;
     const notes = userNote ? [userNote] : [];
@@ -46,7 +45,7 @@ export const uploadProduct = async (req, res) => {
         userNotes: [...existingNotes, ...notes],
       });
     } else if (name) {
-      aiResponse = await processNameWithOpenAI(name, userLanguage, notes);
+      aiResponse = await processNameWithOpenAI(name, notes);
     } else {
       return res.status(400).json({
         success: false,

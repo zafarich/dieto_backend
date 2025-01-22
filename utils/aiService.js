@@ -114,11 +114,7 @@ export const processImageWithOpenAI = async (
 /**
  * Nomi orqali OpenAI xizmatidan foydalanish
  */
-export const processNameWithOpenAI = async (
-  name,
-  language = "uz",
-  userNotes = []
-) => {
+export const processNameWithOpenAI = async (name, userNotes = []) => {
   try {
     const messages = [
       {role: "system", content: SYSTEM_PROMPT},
