@@ -1,8 +1,9 @@
 import OpenAI from "openai";
+import config from "../config/config.js";
 
 // OpenAI konfiguratsiyasi
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: config.openaiApiKey,
 });
 
 // Umumiy sistema prompti
@@ -75,7 +76,7 @@ export const processImageWithOpenAI = async (
           {
             type: "image_url",
             image_url: {
-              url: imageUrl,
+              url: config.siteUrl + imageUrl,
             },
           },
         ],

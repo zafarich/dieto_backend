@@ -36,9 +36,7 @@ export const uploadProduct = async (req, res) => {
       // Rasm fayl yo'li
       const imageUrl = `/public/uploads/products/${image.filename}`;
 
-      console.log("imageUrl", config.siteUrl + imageUrl);
-
-      aiResponse = await processImageWithOpenAI(config.siteUrl + imageUrl, [
+      aiResponse = await processImageWithOpenAI(imageUrl, [
         ...existingNotes,
         ...notes,
       ]);
