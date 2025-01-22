@@ -1,4 +1,3 @@
-import config from "../config/config.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 import DailyStats from "../models/DailyStats.js";
@@ -8,6 +7,7 @@ import {
   processNameWithOpenAI,
 } from "../utils/aiService.js";
 import UserFavoriteProducts from "../models/UserFavoriteProducts.js";
+import config from "../config/config.js";
 
 // Global o'zgaruvchi yaratamiz
 const tempProducts = new Map();
