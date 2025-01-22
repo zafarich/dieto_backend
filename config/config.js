@@ -31,6 +31,7 @@ export const upload = multer({
 
 export default {
   port: process.env.PORT || 3000,
+  siteUrl: process.env.SITE_URL || "https://cdn2.dieto.uz",
   mongoUri: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: "30d",
