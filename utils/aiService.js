@@ -58,7 +58,7 @@ const addUserNotes = (messages, userNotes) => {
  * Rasmni OpenAI orqali qayta ishlash
  */
 export const processImageWithOpenAI = async (
-  imageBuffer,
+  imageUrl,
   userNotes = [],
   previousResults = null
 ) => {
@@ -75,7 +75,7 @@ export const processImageWithOpenAI = async (
           {
             type: "image_url",
             image_url: {
-              url: `data:image/jpeg;base64,${imageBuffer.toString("base64")}`,
+              url: imageUrl,
             },
           },
         ],
