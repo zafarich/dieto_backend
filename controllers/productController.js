@@ -22,10 +22,15 @@ export const uploadProduct = async (req, res) => {
     const {name, userNote} = req.body;
     const image = req.file;
 
-    // Foydalanuvchi tilini olish
+    // Avval mavjud ma'lumotlarni olamiz
+    const existingProduct = tempProducts.get(telegramId);
+    const existingNotes =
+      existingProduct && existingProduct?.userNotes
+        ? existingProduct?.userNotes
+        : [];
 
-    let aiResponse;
     const notes = userNote ? [userNote] : [];
+    let aiResponse;
 
     if (image) {
       // Rasm fayl yo'li
@@ -33,10 +38,10 @@ export const uploadProduct = async (req, res) => {
 
       console.log("imageUrl", config.siteUrl + imageUrl);
 
-      aiResponse = await processImageWithOpenAI(
-        config.siteUrl + imageUrl,
-        notes
-      );
+      aiResponse = await processImageWithOpenAI(config.siteUrl + imageUrl, [
+        ...existingNotes,
+        ...notes,
+      ]);
 
       tempProducts.set(telegramId, {
         aiResponse,
@@ -45,7 +50,10 @@ export const uploadProduct = async (req, res) => {
         userNotes: [...existingNotes, ...notes],
       });
     } else if (name) {
-      aiResponse = await processNameWithOpenAI(name, notes);
+      aiResponse = await processNameWithOpenAI(name, [
+        ...existingNotes,
+        ...notes,
+      ]);
     } else {
       return res.status(400).json({
         success: false,
@@ -54,15 +62,11 @@ export const uploadProduct = async (req, res) => {
     }
 
     // Vaqtinchalik ma'lumotlarni Map-da saqlash
-    const existingProduct = tempProducts.get(telegramId);
-    const existingNotes =
-      existingProduct && existingProduct?.userNotes
-        ? existingProduct?.userNotes
-        : [];
-
     tempProducts.set(telegramId, {
       aiResponse,
-      originalImage: image ? image.buffer : null,
+      originalImage: image
+        ? `/public/uploads/products/${image.filename}`
+        : null,
       originalName: name || null,
       userNotes: [...existingNotes, ...notes],
     });
