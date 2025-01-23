@@ -25,6 +25,7 @@ const SYSTEM_PROMPT_FOR_NAME = `
       2. If not edible, return {success: false}
       3. If edible, calculate nutrition facts for 100g or 1 piece/serving
       4. Then proportionally adjust values for requested amount
+      5. Products will be in Uzbek language
       `;
 
 // JSON strukturasi uchun shablon
