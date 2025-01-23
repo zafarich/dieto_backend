@@ -131,13 +131,13 @@ export const processNameWithOpenAI = async (
       },
     ];
 
-    // Oldingi natijalarni qo'shish
-    if (previousResults) {
-      messages.push({
-        role: "assistant",
-        content: `Oldingi tahlil natijasi: ${JSON.stringify(previousResults)}`,
-      });
-    }
+    // // Oldingi natijalarni qo'shish
+    // if (previousResults) {
+    //   messages.push({
+    //     role: "assistant",
+    //     content: `Oldingi tahlil natijasi: ${JSON.stringify(previousResults)}`,
+    //   });
+    // }
 
     // Foydalanuvchi izohlarini qo'shish
     addUserNotes(messages, userNotes);
