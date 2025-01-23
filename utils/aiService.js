@@ -17,7 +17,8 @@ const SYSTEM_PROMPT = `You are an expert in analyzing various food products, inc
    - Update the specified ingredient's details
    - Recalculate total weight as sum of all ingredients
    - Recalculate total calories based on updated ingredients
-   - Adjust proteins, fats, and carbs proportionally based on ingredient changes`;
+   - All calculations must based on 100 grams of the product or 1 unit of the product
+   `;
 
 // JSON strukturasi uchun shablon
 const JSON_TEMPLATE = `{
