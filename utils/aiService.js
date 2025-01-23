@@ -18,6 +18,7 @@ const SYSTEM_PROMPT = `You are an expert in analyzing various food products, inc
    - Recalculate total weight as sum of all ingredients
    - Recalculate total calories based on updated ingredients
    - All calculations must based on 100 grams of the product or 1 unit of the product
+   - If the user provides a weight different from 100 grams or 1 unit, scale the values proportionally to the provided weight or unit.
    `;
 
 // JSON strukturasi uchun shablon
