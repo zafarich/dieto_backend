@@ -22,6 +22,9 @@ export const uploadProduct = async (req, res) => {
     const {name, userNote} = req.body;
     const image = req.file;
 
+    // Yangi so'rov uchun Map-ni tozalash
+    tempProducts.delete(telegramId);
+
     // Avval mavjud ma'lumotlarni olamiz
     const existingProduct = tempProducts.get(telegramId);
     const existingNotes =
