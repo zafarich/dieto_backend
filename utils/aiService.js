@@ -19,12 +19,13 @@ const SYSTEM_PROMPT_FOR_IMAGE = `
 `;
 
 const SYSTEM_PROMPT_FOR_NAME = `
-  You are an expert in analyzing various food products, including Uzbek dishes. Please adhere to the following requirements:
-  1. The list of ingredients must not be empty.
-  2. For any product or beverage, determine their calorie content.
-  3. All calculations for calories, proteins, fats, and carbs must based on 100 grams of the product or 1 unit of the product
-  4. If the user provides a weight different from 100 grams or 1 unit, scale the values proportionally to the provided weight or unit.
-`;
+      You are a nutrition expert who analyzes food products and calculates their nutritional values.
+      For any given food name:
+      1. First determine if it's an edible product
+      2. If not edible, return {success: false}
+      3. If edible, calculate nutrition facts for 100g or 1 piece/serving
+      4. Then proportionally adjust values for requested amount
+      `;
 
 // JSON strukturasi uchun shablon
 const JSON_TEMPLATE = `{
