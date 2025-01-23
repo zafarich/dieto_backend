@@ -70,16 +70,6 @@ export const uploadProduct = async (req, res) => {
       });
     }
 
-    // Vaqtinchalik ma'lumotlarni Map-da saqlash
-    tempProducts.set(telegramId, {
-      aiResponse,
-      originalImage: image
-        ? `/public/uploads/products/${image.filename}`
-        : null,
-      originalName: name || null,
-      userNotes: [...existingNotes, ...notes],
-    });
-
     res.status(200).json({
       success: true,
       data: aiResponse,
@@ -125,11 +115,9 @@ export const retryAnalysis = async (req, res) => {
         tempProduct.aiResponse
       );
     } else {
-      aiResponse = await processNameWithOpenAI(
-        tempProduct.originalName,
-        user.language,
-        [newNote]
-      );
+      aiResponse = await processNameWithOpenAI(tempProduct.originalName, [
+        newNote,
+      ]);
     }
 
     // Yangilangan ma'lumotlarni Map-da saqlash
