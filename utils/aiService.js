@@ -25,8 +25,9 @@ const SYSTEM_PROMPT_FOR_NAME = `
       2. If not edible, return {success: false}
       3. If edible, calculate nutrition facts for 100g or 1 piece/serving
       4. Determine count or weight of the product
-      5. Then proportionally adjust values for requested amount    
-      6. Products will be in Uzbek language
+      5. Macronutrients must based on 100g or 1 piece/serving
+      6. Then proportionally adjust values for requested amount    
+      7. Products will be in Uzbek language
       `;
 
 // JSON strukturasi uchun shablon
