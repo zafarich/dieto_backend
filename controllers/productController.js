@@ -26,11 +26,6 @@ export const uploadProduct = async (req, res) => {
     tempProducts.delete(telegramId);
 
     // Avval mavjud ma'lumotlarni olamiz
-    const existingProduct = tempProducts.get(telegramId);
-    const existingNotes =
-      existingProduct && existingProduct?.userNotes
-        ? existingProduct?.userNotes
-        : [];
 
     const notes = userNote ? [userNote] : [];
     let aiResponse;
@@ -39,29 +34,23 @@ export const uploadProduct = async (req, res) => {
       // Rasm fayl yo'li
       const imageUrl = `/public/uploads/products/${image.filename}`;
 
-      aiResponse = await processImageWithOpenAI(imageUrl, [
-        ...existingNotes,
-        ...notes,
-      ]);
+      aiResponse = await processImageWithOpenAI(imageUrl, [...notes]);
 
       tempProducts.set(telegramId, {
         aiResponse,
         originalImage: imageUrl,
         originalName: name || null,
-        userNotes: [...existingNotes, ...notes],
+        userNotes: [...notes],
       });
     } else if (name) {
-      aiResponse = await processNameWithOpenAI(name, [
-        ...existingNotes,
-        ...notes,
-      ]);
+      aiResponse = await processNameWithOpenAI(name, [...notes]);
 
       // Vaqtinchalik ma'lumotlarni Map-da saqlash
       tempProducts.set(telegramId, {
         aiResponse,
         originalImage: null,
         originalName: name,
-        userNotes: [...existingNotes, ...notes],
+        userNotes: [...notes],
       });
     } else {
       return res.status(400).json({
@@ -89,7 +78,6 @@ export const uploadProduct = async (req, res) => {
 export const retryAnalysis = async (req, res) => {
   try {
     const telegramId = req.headers["telegram-user-id"];
-    const user = await User.findOne({telegramId});
     const {newNote} = req.body;
 
     // Map-dan ma'lumotlarni olish
@@ -102,11 +90,7 @@ export const retryAnalysis = async (req, res) => {
       });
     }
 
-    console.log(tempProduct);
-    console.log(newNote);
-
     const allNotes = [...(tempProduct?.userNotes || []), newNote];
-    console.log(allNotes);
     let aiResponse;
     if (tempProduct.originalImage) {
       aiResponse = await processImageWithOpenAI(
@@ -116,7 +100,7 @@ export const retryAnalysis = async (req, res) => {
       );
     } else {
       aiResponse = await processNameWithOpenAI(tempProduct.originalName, [
-        newNote,
+        ...allNotes,
       ]);
     }
 

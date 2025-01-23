@@ -58,7 +58,7 @@ const addUserNotes = (messages, userNotes) => {
   userNotes.forEach((note, index) => {
     messages.push({
       role: "user",
-      content: `Qo'shimcha izoh ${index + 1}: ${note}`,
+      content: `${note}`,
     });
   });
   return messages;
@@ -124,11 +124,7 @@ export const processImageWithOpenAI = async (
 /**
  * Nomi orqali OpenAI xizmatidan foydalanish
  */
-export const processNameWithOpenAI = async (
-  name,
-  userNotes = [],
-  previousResults = null
-) => {
+export const processNameWithOpenAI = async (name, userNotes = []) => {
   try {
     const messages = [
       {role: "system", content: SYSTEM_PROMPT},
@@ -150,6 +146,8 @@ export const processNameWithOpenAI = async (
 
     // Foydalanuvchi izohlarini qo'shish
     addUserNotes(messages, userNotes);
+
+    console.log("messages", messages);
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

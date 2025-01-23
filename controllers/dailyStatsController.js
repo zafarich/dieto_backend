@@ -92,8 +92,6 @@ export const getDailyStats = async (req, res) => {
       date: date,
     });
 
-    console.log(dailyStats);
-
     // Agar statistika topilmasa, yangi yaratish
     if (!dailyStats) {
       dailyStats = await DailyStats.create({
