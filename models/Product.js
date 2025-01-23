@@ -7,7 +7,13 @@ const localizedStringSchema = new mongoose.Schema(
   },
   {_id: false}
 );
-
+const localizedDescriptionSchema = new mongoose.Schema(
+  {
+    uz: {type: String, required: false},
+    ru: {type: String, required: false}, // Hozircha rus tilida ma'lumot bo'lmasligi mumkin
+  },
+  {_id: false}
+);
 const productSchema = new mongoose.Schema(
   {
     name: {
@@ -28,7 +34,7 @@ const productSchema = new mongoose.Schema(
       enum: ["count", "gram", "ml"],
     },
     description: {
-      type: localizedStringSchema,
+      type: localizedDescriptionSchema,
     },
     calories: {
       type: Number,
