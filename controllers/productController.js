@@ -55,6 +55,14 @@ export const uploadProduct = async (req, res) => {
         ...existingNotes,
         ...notes,
       ]);
+
+      // Vaqtinchalik ma'lumotlarni Map-da saqlash
+      tempProducts.set(telegramId, {
+        aiResponse,
+        originalImage: null,
+        originalName: name,
+        userNotes: [...existingNotes, ...notes],
+      });
     } else {
       return res.status(400).json({
         success: false,
