@@ -7,22 +7,24 @@ const openai = new OpenAI({
 });
 
 // Umumiy sistema prompti
-const SYSTEM_PROMPT = `You are an expert in analyzing various food products, including Uzbek dishes. Please adhere to the following requirements:
-1. The calorie and fat content should conform to standard nutritional guidelines. For Uzbek dishes, assume they are higher in fat compared to other products and beverages.
-2. All numerical values must be integers.
-3. Weight and calories must be greater than 0.
-4. The list of ingredients must not be empty.
-5. For any product or beverage, determine their calorie content.
-6. Rules:
-    - All calculations for calories, proteins, fats, and carbs must based on 100 grams of the product or 1 unit of the product
-    - If the user provides a weight different from 100 grams or 1 unit, scale the values proportionally to the provided weight or unit.
-7. When user provides additional notes about ingredients, you must:
+const SYSTEM_PROMPT_FOR_IMAGE = `
+  You are an expert in analyzing various food products, including Uzbek dishes. Please adhere to the following requirements:
+  1. The calorie and fat content should conform to standard nutritional guidelines. For Uzbek dishes, assume they are higher in fat compared to other products and beverages.
+  2. The list of ingredients must not be empty.
+  3. For any product or beverage, determine their calorie content.
+  4. When user provides additional notes about ingredients, you must:
    - Update the specified ingredient's details
    - Recalculate total weight as sum of all ingredients
    - Recalculate total calories based on updated ingredients
-   - Adjust proteins, fats, and carbs proportionally based on ingredient changes
-   - Ensure all calculations maintain nutritional balance
-   `;
+`;
+
+const SYSTEM_PROMPT_FOR_NAME = `
+  You are an expert in analyzing various food products, including Uzbek dishes. Please adhere to the following requirements:
+  1. The list of ingredients must not be empty.
+  2. For any product or beverage, determine their calorie content.
+  3. All calculations for calories, proteins, fats, and carbs must based on 100 grams of the product or 1 unit of the product
+  4. If the user provides a weight different from 100 grams or 1 unit, scale the values proportionally to the provided weight or unit.
+`;
 
 // JSON strukturasi uchun shablon
 const JSON_TEMPLATE = `{
@@ -69,7 +71,7 @@ export const processImageWithOpenAI = async (
 ) => {
   try {
     const messages = [
-      {role: "system", content: SYSTEM_PROMPT},
+      {role: "system", content: SYSTEM_PROMPT_FOR_IMAGE},
       {
         role: "user",
         content: [
@@ -122,7 +124,7 @@ export const processImageWithOpenAI = async (
 export const processNameWithOpenAI = async (name, userNotes = []) => {
   try {
     const messages = [
-      {role: "system", content: SYSTEM_PROMPT},
+      {role: "system", content: SYSTEM_PROMPT_FOR_NAME},
       {
         role: "user",
         content: `Mahsulot/taom nomi: "${name}"
