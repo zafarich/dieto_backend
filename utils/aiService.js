@@ -115,7 +115,11 @@ export const processImageWithOpenAI = async (
 /**
  * Nomi orqali OpenAI xizmatidan foydalanish
  */
-export const processNameWithOpenAI = async (name, userNotes = []) => {
+export const processNameWithOpenAI = async (
+  name,
+  userNotes = [],
+  previousResults = null
+) => {
   try {
     const messages = [
       {role: "system", content: SYSTEM_PROMPT},
@@ -126,6 +130,14 @@ export const processNameWithOpenAI = async (name, userNotes = []) => {
         ${JSON_TEMPLATE}`,
       },
     ];
+
+    // Oldingi natijalarni qo'shish
+    if (previousResults) {
+      messages.push({
+        role: "assistant",
+        content: `Oldingi tahlil natijasi: ${JSON.stringify(previousResults)}`,
+      });
+    }
 
     // Foydalanuvchi izohlarini qo'shish
     addUserNotes(messages, userNotes);
