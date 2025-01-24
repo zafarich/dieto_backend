@@ -23,14 +23,16 @@ For any given food name in Uzbek:
 
 Determine if the product is edible.
 If it is not edible, return: {success: false}.
-If it is edible, define whether the product is typically measured by weight (grams) or as a countable unit (dona):
-For weight-based products (e.g., un, guruch), use 100 grams as the standard measurement.
-For countable products (e.g., olma, tuxum), use the average size/weight of 1 piece as the standard.
-If the product is countable:
-Automatically assume 1 dona for the calculation unless a specific quantity is mentioned later.
-Calculate the macronutrient composition and calorie count:
-Macronutrients (carbohydrates, protein, fat) must be based on the average nutritional values of the product.
-      `;
+If it is edible:
+Identify whether the product is countable (e.g., tuxum, olma) or measured by weight (e.g., guruch, go'sht).
+Use 100 grams as the default base for weight-based products.
+If the product is weight-based (e.g., tovuq go'shti):
+Automatically calculate the nutritional values for 100 grams by default.
+If a specific weight is mentioned (e.g., "200 gram tovuq go'shti"), proportionally adjust the values for the given weight.
+If the product is countable (e.g., tuxum, olma):
+Use the average weight of 1 piece (e.g., tuxum ~60g, olma ~150g).
+Calculate values for 1 piece or scale proportionally if the quantity is specified.
+Macronutrients (carbohydrates, protein, fats) and calorie values must be accurately calculated based on standardized data for the product.`;
 
 // JSON strukturasi uchun shablon
 const JSON_TEMPLATE = `{
