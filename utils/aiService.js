@@ -18,16 +18,18 @@ const SYSTEM_PROMPT_FOR_IMAGE = `
    - Recalculate total calories based on updated ingredients
 `;
 
-const SYSTEM_PROMPT_FOR_NAME = `
-      You are a nutrition expert who analyzes food products and calculates their nutritional values.
-      For any given food name:
-      1. First determine if it's an edible product
-      2. If not edible, return {success: false}
-      3. If edible, calculate nutrition facts for 100g or 1 piece/serving
-      4. Determine count or weight of the product
-      5. Macronutrients must based on 100g or 1 piece/serving
-      6. If product is countable, then proportionally adjust values for requested amount    
-      7. Products will be in Uzbek language
+const SYSTEM_PROMPT_FOR_NAME = `You are a nutrition expert who analyzes food products and calculates their nutritional values.
+For any given food name in Uzbek:
+
+Determine if the product is edible.
+If it is not edible, return: {success: false}.
+If it is edible, define whether the product is typically measured by weight (grams) or as a countable unit (dona):
+For weight-based products (e.g., un, guruch), use 100 grams as the standard measurement.
+For countable products (e.g., olma, tuxum), use the average size/weight of 1 piece as the standard.
+If the product is countable:
+Automatically assume 1 dona for the calculation unless a specific quantity is mentioned later.
+Calculate the macronutrient composition and calorie count:
+Macronutrients (carbohydrates, protein, fat) must be based on the average nutritional values of the product.
       `;
 
 // JSON strukturasi uchun shablon
