@@ -18,16 +18,13 @@ const SYSTEM_PROMPT_FOR_IMAGE = `
    - Recalculate total calories based on updated ingredients
 `;
 
-const SYSTEM_PROMPT_FOR_NAME = `
-      You are a nutrition expert who analyzes food products and calculates their nutritional values.
-      For any given food name:
-      1. First determine if it's an edible product
-      2. If not edible, return {success: false}
-      3. If edible, calculate nutrition facts for 100g or 1 piece/serving
-      4. Determine count or weight of the product
-      5. Macronutrients must based on 100g or 1 piece/serving
-      6. Then proportionally adjust values for requested amount    
-      7. Products will be in Uzbek language
+const SYSTEM_PROMPT_FOR_NAME = `You will assist in developing a feature for an app that helps users manage their weight by calculating calorie content based on product or meal names. The user will provide the name of a food item or meal, and you will return the estimated calorie content along with relevant nutritional information. Please provide the calorie calculation based on the latest food databases and reliable nutrition resources. Ensure the response is clear, concise, and informative, including where the data is sourced from when applicable. 
+
+**Parameters:** 
+- Input: Name of the food item or meal (Name will be in Uzbek language, e.g., '200 gram tovuq go'shti') 
+- Output: Estimated calories and nutritional details (e.g., "200 gram tovuq go'shti: 330 calories, 60g protein, 8g fat, 0g carbohydrates") 
+
+Make sure to handle common variations in meal names and provide an error message if the food item is not recognized.
       `;
 
 // JSON strukturasi uchun shablon
@@ -131,8 +128,8 @@ export const processNameWithOpenAI = async (name, userNotes = []) => {
       {role: "system", content: SYSTEM_PROMPT_FOR_NAME},
       {
         role: "user",
-        content: `Mahsulot/taom nomi: "${name}"
-        Quyidagi strukturada JSON qaytaring:
+        content: `Product/meal name: "${name}"
+        Return JSON in Uzbek language:
         ${JSON_TEMPLATE}`,
       },
     ];
