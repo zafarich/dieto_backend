@@ -214,7 +214,7 @@ async function updateDailyStats(userId, meal, productData) {
   date.setHours(0, 0, 0, 0);
 
   let dailyStats = await DailyStats.findOne({userId, date});
-
+  console.log("dailyStats", dailyStats);
   if (!dailyStats) {
     // Yangi kunlik statistika yaratish
     dailyStats = new DailyStats({
