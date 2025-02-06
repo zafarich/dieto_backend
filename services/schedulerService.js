@@ -5,19 +5,19 @@ import {calculateMealSplits} from "../utils/nutritionCalculator.js";
 
 // Har kuni yarim tunda ishga tushadigan scheduler
 export const startDailyStatsScheduler = () => {
-  // '0 0 * * *' = har kuni soat 00:00 da
+  // '*/10 * * * * *' = har 10 soniyada
   cron.schedule(
-    "0 0 * * *",
+    "*/10 * * * * *",
     async () => {
       try {
-        console.log("Kunlik statistika scheduleri ishga tushdi:", new Date());
+        console.log("Test scheduler ishga tushdi:", new Date());
 
         // Barcha foydalanuvchilarni olish
         const users = await User.find({});
 
-        // Yangi kun sanasi
+        // Toshkent vaqt zonasida yangi kun sanasi
         const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0); // UTC emas, mahalliy vaqtni ishlatamiz
 
         // Kechagi sana
         const yesterday = new Date(today);
