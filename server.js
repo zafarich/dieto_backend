@@ -40,10 +40,18 @@ app.use(
 // Middleware
 app.use(
   cors({
-    origin: ["*"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ],
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 app.use(express.json());
@@ -59,8 +67,8 @@ connectDB();
 startDailyStatsScheduler();
 
 // Routes
-app.use("/", () => {
-  return "ss";
+app.get("/", (req, res) => {
+  res.send("Server is running");
 });
 app.use("/api", userRoutes);
 app.use("/api/daily-stats", dailyStatsRoutes);
