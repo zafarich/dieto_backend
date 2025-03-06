@@ -52,9 +52,6 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 // Database ulanish
 connectDB();
 
-// Schedulerni ishga tushirish
-startDailyStatsScheduler();
-
 // Routes
 app.get("/", (req, res) => {
   res.send("Server is running");
