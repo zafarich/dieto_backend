@@ -84,6 +84,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(config.port, () => {
-  console.log(`Server ${config.port}-portda ishga tushdi`);
+app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
+  console.log(`Server ${process.env.PORT || 3000}-portda ishga tushdi`);
 });
