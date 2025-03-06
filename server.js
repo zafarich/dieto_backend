@@ -59,6 +59,9 @@ connectDB();
 startDailyStatsScheduler();
 
 // Routes
+app.use("/", () => {
+  return "ss";
+});
 app.use("/api", userRoutes);
 app.use("/api/daily-stats", dailyStatsRoutes);
 app.use("/api/products", productRoutes);
