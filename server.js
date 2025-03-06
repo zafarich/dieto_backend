@@ -9,6 +9,7 @@ import userRoutes from "./routes/userRoutes.js";
 import dailyStatsRoutes from "./routes/dailyStatsRoutes.js";
 import {startDailyStatsScheduler} from "./services/schedulerService.js";
 import productRoutes from "./routes/productRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 import fs from "fs";
 
 const app = express();
@@ -54,6 +55,7 @@ startDailyStatsScheduler();
 app.use("/api", userRoutes);
 app.use("/api/daily-stats", dailyStatsRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api", contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

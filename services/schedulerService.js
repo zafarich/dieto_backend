@@ -30,6 +30,7 @@ export const startDailyStatsScheduler = () => {
               userId: user._id,
               date: yesterday,
             });
+            console.log("yesterdayStats", yesterdayStats);
 
             // Yangi kun uchun statistika yaratish
             const newDailyStats = new DailyStats({
